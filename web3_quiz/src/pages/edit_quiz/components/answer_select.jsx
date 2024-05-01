@@ -1,14 +1,14 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
-import {ImCross} from "react-icons/im";
+import { ImCross } from "react-icons/im";
 import Answer_area1 from "./answer_form1";
 import Answer_area2 from "./answer_form2";
 
 function Answer_select(props) {
-    const [component, setComponent] = useState("Component1");
+    const [component, setComponent] = useState("component1");
 
     const handleClick = (event) => {
-        const {name} = event.target;
+        const { name } = event.target;
         setComponent(name);
         if (name === "Answer_area1") {
             props.setAnswer_type(0);
@@ -20,12 +20,12 @@ function Answer_select(props) {
     if (true) {
         return (
             <div>
-                <div className="btn-group" style={{margin: "20px"}}>
+                <div className="btn-group" style={{ margin: "20px" }}>
                     <button type="button" name="Answer_area1" className="btn btn-primary" onClick={handleClick}>
                         択一形式
                     </button>
                 </div>
-                <div className="btn-group" style={{margin: "20px"}}>
+                <div className="btn-group" style={{ margin: "20px" }}>
                     <button type="button" name="Answer_area2" className="btn btn-primary" onClick={handleClick}>
                         入力形式
                     </button>

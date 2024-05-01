@@ -1,18 +1,19 @@
-import {Contracts_MetaMask} from "../../contract/contracts";
+import { Contracts_MetaMask } from "../../contract/contracts";
 import Form from "react-bootstrap/Form";
-import {useState, useEffect, useRef} from "react";
-import MDEditor, {selectWord} from "@uiw/react-md-editor";
-import {resolvePath, useParams} from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import MDEditor, { selectWord } from "@uiw/react-md-editor";
+import { resolvePath, useParams } from "react-router-dom";
 import Simple_quiz from "./components/quiz_simple";
 import Quiz_list from "./components/quiz_list";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
-function List_quiz_top(props) {
+function Edit_list_top(props) {
     //クイズのコントラクト
     let cont = new Contracts_MetaMask();
 
     //現在表示している個数を保持するref
     const now_numRef = useRef(0); //保存
+    const [isTeacher, setIsTeacher] = useState(false);
     //クイズの総数
     const [quiz_sum, Set_quiz_sum] = useState(null); //保存
 
@@ -43,30 +44,39 @@ function List_quiz_top(props) {
             Set_quiz_sum(now);
             now_numRef.current = now;
         });
+        const set_is_teacher = async () => {
+            setIsTeacher(await cont.isTeacher());
+        };
+        set_is_teacher();
     }, []);
 
     const targetRef = useRef(null); // ターゲット要素のrefを作成
+    console.log("ユーザーのisTeacherステータス");
+    console.log(isTeacher);
+    if (isTeacher) {
+        if (quiz_sum != null) {
+            return (
+                <>
+                    {/* スクロールを監視するコンポーネント */}
+                    <Quiz_list cont={cont} add_num={add_num} Set_add_num={Set_add_num} quiz_sum={quiz_sum} Set_quiz_sum={Set_quiz_sum} quiz_list={quiz_list} Set_quiz_list={Set_quiz_list} targetRef={targetRef} now_numRef={now_numRef} />
 
-    if (quiz_sum != null) {
-        return (
-            <>
-                {/* スクロールを監視するコンポーネント */}
-                <Quiz_list cont={cont} add_num={add_num} Set_add_num={Set_add_num} quiz_sum={quiz_sum} Set_quiz_sum={Set_quiz_sum} quiz_list={quiz_list} Set_quiz_list={Set_quiz_list} targetRef={targetRef} now_numRef={now_numRef} />
-
-                {/* */}
-                {quiz_list.map((quiz, index) => {
-                    if (index !== quiz_list.length - add_num) {
-                        return <>{quiz_list[index]}</>;
-                    }
-                })}
-                <div ref={targetRef}>
-                    {/* ターゲット要素aの内容 */}
-                    now_loading
-                </div>
-            </>
-        );
+                    {/* */}
+                    {quiz_list.map((quiz, index) => {
+                        if (index !== quiz_list.length - add_num) {
+                            return <>{quiz_list[index]}</>;
+                        }
+                    })}
+                    <div ref={targetRef}>
+                        {/* ターゲット要素aの内容 */}
+                        now_loading
+                    </div>
+                </>
+            );
+        } else {
+            return <></>;
+        }
     } else {
         return <></>;
     }
 }
-export default List_quiz_top;
+export default Edit_list_top;

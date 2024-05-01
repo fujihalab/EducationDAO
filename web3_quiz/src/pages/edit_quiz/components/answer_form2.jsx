@@ -1,6 +1,6 @@
 import Button from "react-bootstrap/Button";
-import {useState, useEffect} from "react";
-import {ImCross} from "react-icons/im";
+import { useState, useEffect } from "react";
+import { ImCross } from "react-icons/im";
 function Answer_area2(props) {
     const [content, SetContent] = useState("");
     const [pattern, SetPattern] = useState("");

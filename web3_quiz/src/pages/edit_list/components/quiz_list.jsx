@@ -1,10 +1,10 @@
 import Form from "react-bootstrap/Form";
-import {useState, useEffect, useRef} from "react";
-import MDEditor, {selectWord} from "@uiw/react-md-editor";
-import {resolvePath, useLocation} from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import MDEditor, { selectWord } from "@uiw/react-md-editor";
+import { resolvePath, useLocation } from "react-router-dom";
 import Simple_quiz from "./quiz_simple";
 
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 function Quiz_list(props) {
     const location = useLocation();
     //画面を満たす個数を計算して、add_numに代入
@@ -24,13 +24,14 @@ function Quiz_list(props) {
         //クイズの総数を超えていたら
         if (now - add_num.current < 0) {
             //now_numからquiz_numまでのクイズを取得
-            add_quiz_list = await props.cont.get_quiz_list(now, 0);
+            add_quiz_list = await props.cont.get_quiz_all_data_list(now, 0);
             //now_numを0にする
             props.now_numRef.current = 0;
         } else {
             //クイズの総数を超えていなかったら
             //now_numからnow_num+add_numまでのクイズを取得
-            add_quiz_list = await props.cont.get_quiz_list(now, now - add_num.current);
+            add_quiz_list = await props.cont.get_quiz_all_data_list(now, now - add_num.current);
+            console.log(add_quiz_list);
             //now_numをnow_num+add_numにする
             props.now_numRef.current = now - add_num.current;
         }
@@ -39,6 +40,7 @@ function Quiz_list(props) {
 
         //add_quiz_listをmapで展開して、now_quiz_listに追加
         add_quiz_list.map((quiz) => {
+            console.log(quiz)
             now_quiz_list.push(<Simple_quiz quiz={quiz} />); //DOMとして追加
         });
 

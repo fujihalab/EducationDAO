@@ -23,38 +23,43 @@ function Create_quiz() {
         new Date()
             .toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
             .replace(/[/]/g, "-")
-            .replace(/\s(\d):/, " 0$1:")
+            .replace(/\s(\d):/, " 0$1:"),
     );
-    const [reply_deadline, setReply_deadline] = useState(
-        new Date()
-            .toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })
-            .replace(/[/]/g, "-")
-            .replace(/\s(\d):/, " 0$1:")
-    );
-    const [reward, setReward] = useState(1);
-    const [correct_limit, setCorrect_limit] = useState(1);
+    const [reply_deadline, setReply_deadline] = useState(getLocalizedDateTimeString(addDays(new Date(), 1)));
+    const [reward, setReward] = useState(0);
+
+    let Contract = new Contracts_MetaMask();
+
+    const [correct_limit, setCorrect_limit] = useState(null);
     const [state, setState] = useState("Null");
     const [now, setnow] = useState(null);
     const [show, setShow] = useState(false);
 
-    let Contract = new Contracts_MetaMask();
+    const convertFullWidthNumbersToHalf = (() => {
+        // 全角数字と半角数字の差分を計算
+        const diff = "０".charCodeAt(0) - "0".charCodeAt(0);
+
+        // 置換関数を返す
+        return text => text.replace(
+            /[０-９]/g
+            , m => String.fromCharCode(m.charCodeAt(0) - diff)
+        );
+    })();
 
     const create_quiz = async () => {
-        console.log(title, explanation, thumbnail_url, content, answer_data, correct, reply_startline, reply_deadline, reward, correct_limit);
+        //console.log(title, explanation, thumbnail_url, content, answer_data, correct, reply_startline, reply_deadline, reward, correct_limit);
 
         if (correct !== "") {
             console.log(new Date(reply_startline).getTime(), new Date(reply_deadline).getTime());
-            if (new Date(reply_startline).getTime() < new Date(reply_deadline).getTime()) {
-                Contract.create_quiz(title, explanation, thumbnail_url, content, answer_type, answer_data, correct, reply_startline, reply_deadline, reward, correct_limit, setShow);
-            } else {
-                alert("回答開始日時を回答締切日時より前に設定してください");
-            }
+            Contract.create_quiz(title, explanation, thumbnail_url, content, answer_type, answer_data, convertFullWidthNumbersToHalf(correct), reply_startline, reply_deadline, reward, correct_limit, setShow);
         } else {
             alert("正解を入力してください");
         }
     };
-    function getLocalizedDateTimeString() {
-        const now = new Date();
+
+
+
+    function getLocalizedDateTimeString(now = new Date()) {
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, "0");
         const day = String(now.getDate()).padStart(2, "0");
@@ -79,13 +84,28 @@ function Create_quiz() {
 
         return localizedDateTimeString;
     }
+    function addDays(date, days) {
+        date.setDate(date.getDate() + days);
+        return date;
+    }
 
     //初回のみ実行
     useEffect(() => {
+        // let now = new Date();
+        // const diff_time = new Date(now + 100);
+        // setReply_deadline(addDays(now, 5));
+        async function get_contract() {
+            setCorrect_limit((await Contract.get_num_of_students()) + 30);
+            //setCorrect_limit((await Contract.get_num_of_students()) + 150);
+        }
+        get_contract();
         setnow(getLocalizedDateTimeString());
-        console.log(now);
-        console.log(new Date().toISOString().slice(0, 16));
+        // console.log(now);
+        // console.log(new Date().toISOString().slice(0, 16));
     }, []);
+    console.log(reply_deadline);
+    console.log(reply_startline);
+
     return (
         <div>
             <div className="row">
@@ -135,14 +155,15 @@ function Create_quiz() {
                         <Form.Label>回答締切日時</Form.Label>
                         <Form.Control
                             type="datetime-local"
-                            defaultValue={now}
+                            defaultValue={reply_deadline}
                             //value={reply_deadline}
                             min={now}
                             onChange={(event) => setReply_deadline(new Date(event.target.value))}
                         />
                     </Form.Group>
-
+                    {/*
                     <div className="row">
+
                         <Form.Group className="mb-3 col-4" style={{ textAlign: "left" }}>
                             <Form.Label>報酬</Form.Label>
                             <Form.Control type="number" min={1} step={1} value={reward} onChange={(event) => setReward(parseInt(event.target.value))} />
@@ -154,6 +175,7 @@ function Create_quiz() {
                             <Form.Control type="number" min={1} step={1} value={correct_limit} onChange={(event) => setCorrect_limit(parseInt(event.target.value))} />
                         </Form.Group>
                     </div>
+                    */}
 
                     <div style={{ textAlign: "right" }}>
                         <Button variant="primary" onClick={() => create_quiz()} style={{ marginTop: "20px" }}>

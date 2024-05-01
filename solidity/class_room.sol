@@ -19,15 +19,27 @@ contract class_room {
         _;
     }
 
+    function _isTeacher() public view returns (bool) {
+        if (teachers[msg.sender] == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function _isTeacher(address user) public view returns (bool) {
+        if (teachers[user] == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function check_teacher(address _target) internal view returns (bool res) {
         res = teachers[_target];
     }
 
-    function add_teacher(address teacher_address)
-        public
-        isTeacher
-        returns (bool res)
-    {
+    function add_teacher(address teacher_address) public isTeacher returns (bool res) {
         if (teachers[teacher_address] == false) {
             teachers[teacher_address] = true;
             teacher_address_list.push(teacher_address);
@@ -35,11 +47,7 @@ contract class_room {
         res = true; //await　への返答
     }
 
-    function add_student(address[] memory students_address)
-        public
-        isTeacher
-        returns (bool res)
-    {
+    function add_student(address[] memory students_address) public isTeacher returns (bool res) {
         for (uint256 i = 0; i < students_address.length; i++) {
             if (students[students_address[i]] == false) {
                 students[students_address[i]] = true;
@@ -49,21 +57,11 @@ contract class_room {
         res = true;
     }
 
-    function get_student_all()
-        public
-        view
-        isTeacher
-        returns (address[] memory result)
-    {
+    function get_student_all() public view isTeacher returns (address[] memory result) {
         result = student_address_list;
     }
 
-    function get_teacher_all()
-        public
-        view
-        isTeacher
-        returns (address[] memory result)
-    {
+    function get_teacher_all() public view isTeacher returns (address[] memory result) {
         result = teacher_address_list;
     }
 }
